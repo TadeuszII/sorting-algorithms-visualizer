@@ -17,13 +17,22 @@ def bubble_sort_z_flaga(*, data, drawData, update_Matryki) -> list:
             if not Pauza_Krok():
                 return None
             
+            colorArray = ["blue" if x >= n - i else "red" for x in range(n)]
+            colorArray[j] = "yellow"
+            colorArray[j + 1] = "yellow"
+            drawData(data=data, colorArray=colorArray)
+            if not gb.Czekaj():
+                return None
+
             gb.porownanie += 1
+            swapped_now = False
             
             if data[j] > data[j+1]:
                 data[j], data[j+1] = data[j+1], data[j]
                 
                 # -- Ustawiamy flagę, że dokonano zmiany --
                 swapped = True 
+                swapped_now = True
                 
                 gb.zmiany += 1
                 gb.zapisy += 3
@@ -32,7 +41,10 @@ def bubble_sort_z_flaga(*, data, drawData, update_Matryki) -> list:
             update_Matryki(porownanie=gb.porownanie, zmiany=gb.zmiany, zapisy=gb.zapisy, czas=czas)
             
 
-            drawData(data=data, colorArray=["green" if x == j or x == j+1 else "red" for x in range(len(data))])
+            colorArray = ["blue" if x >= n - i else "red" for x in range(n)]
+            colorArray[j] = "green" if swapped_now else "yellow"
+            colorArray[j + 1] = "green" if swapped_now else "yellow"
+            drawData(data=data, colorArray=colorArray)
             
             if not Pauza_Krok():
                 return None

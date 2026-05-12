@@ -2,18 +2,36 @@ import time
 import globalne_zmienne as gb
 from globalne_zmienne import Pauza_Krok
 
-def compAndSwap(data, i, j, dire, drawData, update_Matryki):
+def getColorArray(dataLen, low, cnt, dire, i=None, j=None, highlight="yellow"):
+    colorArray = ["white" for _ in range(dataLen)]
+    for x in range(low, low + cnt):
+        if 0 <= x < dataLen:
+            colorArray[x] = "blue" if dire == 1 else "purple"
+
+    if i is not None:
+        colorArray[i] = highlight
+    if j is not None:
+        colorArray[j] = highlight
+    return colorArray
+
+def compAndSwap(data, i, j, dire, low, cnt, drawData, update_Matryki):
     if not Pauza_Krok(): return False
     
-    drawData(data=data, colorArray=["yellow" if x == i or x == j else "red" for x in range(len(data))])
+    drawData(data=data, colorArray=getColorArray(len(data), low, cnt, dire, i, j, "yellow"))
     if not gb.Czekaj(): return False
     if not Pauza_Krok(): return False
     
     gb.porownanie += 1
+    swapped = False
     if (dire == 1 and data[i] > data[j]) or (dire == 0 and data[i] < data[j]):
         data[i], data[j] = data[j], data[i]
         gb.zmiany += 1
         gb.zapisy += 3
+        swapped = True
+
+    if swapped:
+        drawData(data=data, colorArray=getColorArray(len(data), low, cnt, dire, i, j, "green"))
+        if not gb.Czekaj(): return False
         
     czas = time.time() - gb.czas_startu
     update_Matryki(porownanie=gb.porownanie, zmiany=gb.zmiany, zapisy=gb.zapisy, czas=czas)
@@ -23,7 +41,7 @@ def bitonicMerge(data, low, cnt, dire, drawData, update_Matryki):
     if cnt > 1:
         k = cnt // 2
         for i in range(low, low + k):
-            if compAndSwap(data, i, i + k, dire, drawData, update_Matryki) is False: 
+            if compAndSwap(data, i, i + k, dire, low, cnt, drawData, update_Matryki) is False: 
                 return False
         if bitonicMerge(data, low, k, dire, drawData, update_Matryki) is False: return False
         if bitonicMerge(data, low + k, k, dire, drawData, update_Matryki) is False: return False

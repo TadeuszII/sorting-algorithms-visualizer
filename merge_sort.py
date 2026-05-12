@@ -3,17 +3,19 @@ import globalne_zmienne as gb
 from globalne_zmienne import Pauza_Krok
 
 # --- Helper: Color Logic (Adapted from your Quick Sort) ---
-def getColorArray(dataLen, start, end, activeIdx, isSwaping=False):
+def getColorArray(dataLen, start, mid, end, activeIdx, isSwaping=False, sourceIdx=None):
     collorArray = []
     for i in range(dataLen):
-        # 1. Base Coloring (White)
-        collorArray.append("white")
+        if start <= i <= mid:
+            collorArray.append("blue")
+        elif mid < i <= end:
+            collorArray.append("purple")
+        else:
+            collorArray.append("white")
 
-        # 2. Active Partition Range (Gray) - Like Head/Tail in QuickSort
-        if i >= start and i <= end:
-            collorArray[i] = "gray"
+        if i == sourceIdx:
+            collorArray[i] = "pink"
 
-        # 3. Active Writing Index (Yellow/Green) - Like CurrentIndex in QuickSort
         if i == activeIdx:
             if isSwaping:
                 collorArray[i] = "green" # Writing/Changing value
@@ -37,19 +39,21 @@ def merge(data, start, mid, end, drawData, update_Matryki):
         # --- Pauza / krok ---
         if not Pauza_Krok(): return False
 
-        # --- Show current index (Yellow) ---
-        drawData(data=data, colorArray=getColorArray(len(data), start, end, k, isSwaping=False))
-        if not gb.Czekaj(): return False
-
-        gb.porownanie += 1
-        
-        # Decide which element to pick
+        # --- Show target index and selected source value ---
         if left_part[i] <= right_part[j]:
             val_to_write = left_part[i]
+            sourceIdx = start + i
             i += 1
         else:
             val_to_write = right_part[j]
+            sourceIdx = mid + 1 + j
             j += 1
+
+        drawData(data=data, colorArray=getColorArray(len(data), start, mid, end, k, isSwaping=False, sourceIdx=sourceIdx))
+        if not gb.Czekaj(): return False
+        if not Pauza_Krok(): return False
+
+        gb.porownanie += 1
         
         # --- Visualise Write (Green) ---
         # We perform the write and highlight it green, similar to the swap in QuickSort
@@ -58,7 +62,7 @@ def merge(data, start, mid, end, drawData, update_Matryki):
         gb.zapisy += 1
         gb.zmiany += 1
         
-        drawData(data=data, colorArray=getColorArray(len(data), start, end, k, isSwaping=True))
+        drawData(data=data, colorArray=getColorArray(len(data), start, mid, end, k, isSwaping=True))
         if not Pauza_Krok(): return False
         if not gb.Czekaj(): return False
 
@@ -71,15 +75,18 @@ def merge(data, start, mid, end, drawData, update_Matryki):
     # --- Copy remaining elements from Left (if any) ---
     while i < len(left_part):
         if not Pauza_Krok(): return False
-        
-        drawData(data=data, colorArray=getColorArray(len(data), start, end, k, isSwaping=False))
+
+        sourceIdx = start + i
+        drawData(data=data, colorArray=getColorArray(len(data), start, mid, end, k, isSwaping=False, sourceIdx=sourceIdx))
         if not gb.Czekaj(): return False
+        if not Pauza_Krok(): return False
 
         data[k] = left_part[i]
         gb.zapisy += 1
         gb.zmiany += 1
         
-        drawData(data=data, colorArray=getColorArray(len(data), start, end, k, isSwaping=True))
+        drawData(data=data, colorArray=getColorArray(len(data), start, mid, end, k, isSwaping=True))
+        if not Pauza_Krok(): return False
         if not gb.Czekaj(): return False
         
         i += 1
@@ -91,15 +98,18 @@ def merge(data, start, mid, end, drawData, update_Matryki):
     # --- Copy remaining elements from Right (if any) ---
     while j < len(right_part):
         if not Pauza_Krok(): return False
-        
-        drawData(data=data, colorArray=getColorArray(len(data), start, end, k, isSwaping=False))
+
+        sourceIdx = mid + 1 + j
+        drawData(data=data, colorArray=getColorArray(len(data), start, mid, end, k, isSwaping=False, sourceIdx=sourceIdx))
         if not gb.Czekaj(): return False
+        if not Pauza_Krok(): return False
 
         data[k] = right_part[j]
         gb.zapisy += 1
         gb.zmiany += 1
         
-        drawData(data=data, colorArray=getColorArray(len(data), start, end, k, isSwaping=True))
+        drawData(data=data, colorArray=getColorArray(len(data), start, mid, end, k, isSwaping=True))
+        if not Pauza_Krok(): return False
         if not gb.Czekaj(): return False
         
         j += 1
@@ -111,9 +121,6 @@ def merge(data, start, mid, end, drawData, update_Matryki):
     return True
 
 def merge_sort_recursion(data, start, end, drawData, update_Matryki):
-    # Pauza / krok
-    if not Pauza_Krok(): return None
-
     if start < end:
         mid = (start + end) // 2
         

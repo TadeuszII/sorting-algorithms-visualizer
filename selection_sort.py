@@ -11,7 +11,7 @@ def selection_sort(*, data, drawData, update_Matryki):
             if not Pauza_Krok(): return None
             
             gb.porownanie += 1
-            drawData(data=data, colorArray=["yellow" if x == min_idx else "green" if x == j else "red" for x in range(len(data))])
+            drawData(data=data, colorArray=["blue" if x < i else "yellow" if x == min_idx else "green" if x == j else "red" for x in range(len(data))])
             if not gb.Czekaj(): return None
             if not Pauza_Krok(): return None
 
@@ -22,6 +22,9 @@ def selection_sort(*, data, drawData, update_Matryki):
             data[i], data[min_idx] = data[min_idx], data[i]
             gb.zmiany += 1
             gb.zapisy += 3
+
+            drawData(data=data, colorArray=["blue" if x < i else "green" if x == i or x == min_idx else "red" for x in range(len(data))])
+            if not gb.Czekaj(): return None
         
         czas = time.time() - gb.czas_startu
         update_Matryki(porownanie=gb.porownanie, zmiany=gb.zmiany, zapisy=gb.zapisy, czas=czas)

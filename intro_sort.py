@@ -20,8 +20,10 @@ def insertion_sort_range(data, start, end, drawData, update_Matryki):
                 colorArray.append("yellow")
             elif x >= start and x < i:
                 colorArray.append("blue")
-            else:
+            elif start <= x <= end:
                 colorArray.append("red")
+            else:
+                colorArray.append("white")
         
         drawData(data=data, colorArray=colorArray)
 
@@ -40,8 +42,10 @@ def insertion_sort_range(data, start, end, drawData, update_Matryki):
                     colorArray.append("yellow")  # aktywny element
                 elif x >= start and x <= i:
                     colorArray.append("blue")    # Posortowana partycja
-                else:
+                elif start <= x <= end:
                     colorArray.append("red")     # Niesortowana partycja
+                else:
+                    colorArray.append("white")   # poza zakresem
 
             drawData(data=data, colorArray=colorArray)
             if not gb.Czekaj(): return False
@@ -84,7 +88,7 @@ def heapify_range(data, n, i, start, end_range, drawData, update_Matryki):
         elif x >= start and x < heap_end_idx:
             colorArray.append("red")    # Reszta nieposortowanego kopca
         else:
-            colorArray.append("red")    # poza zakresem
+            colorArray.append("white")  # poza zakresem
             
     drawData(data=data, colorArray=colorArray)
     if not gb.Czekaj(): return False
@@ -141,7 +145,7 @@ def heap_sort_range(data, start, end, drawData, update_Matryki):
             elif x >= start and x < i:
                 colorArray.append("red")    # Pozostała sterta
             else:
-                colorArray.append("red")    # Pozostała sterta
+                colorArray.append("white")  # poza zakresem
 
         drawData(data=data, colorArray=colorArray)
         if not gb.Czekaj(): return False
