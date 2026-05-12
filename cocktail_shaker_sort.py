@@ -18,7 +18,7 @@ def cocktail_shaker_sort(*, data, drawData, update_Matryki):
             
             gb.porownanie += 1
             drawData(data=data, colorArray=["green" if x == i or x == i+1 else "red" for x in range(len(data))])
-            time.sleep(gb.time_tick)
+            if not gb.Czekaj(): return None
 
             if data[i] > data[i + 1]:
                 data[i], data[i + 1] = data[i + 1], data[i]
@@ -39,7 +39,7 @@ def cocktail_shaker_sort(*, data, drawData, update_Matryki):
             
             gb.porownanie += 1
             drawData(data=data, colorArray=["green" if x == i or x == i+1 else "red" for x in range(len(data))])
-            time.sleep(gb.time_tick)
+            if not gb.Czekaj(): return None
 
             if data[i] > data[i + 1]:
                 data[i], data[i + 1] = data[i + 1], data[i]

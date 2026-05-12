@@ -29,7 +29,8 @@ def bubble_sort(*,data, drawData, update_Matryki) -> list:
             drawData(data=data, colorArray=["green" if x == j or x == j+1 else "red" for x in range(len(data))])
             if not Pauza_Krok():
                 return None
-            time.sleep(gb.time_tick)
+            if not gb.Czekaj():
+                return None
 
         czas = time.time() - gb.czas_startu
         update_Matryki(porownanie=gb.porownanie, zmiany=gb.zmiany, zapisy=gb.zapisy, czas=czas)

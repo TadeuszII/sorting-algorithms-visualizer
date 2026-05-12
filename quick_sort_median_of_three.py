@@ -27,7 +27,8 @@ def partition(*, data, head, tail, drawData , update_Matryki):
         )
     if not Pauza_Krok():
         return None
-    time.sleep(gb.time_tick)
+    if not gb.Czekaj():
+        return None
         
 
 
@@ -54,7 +55,8 @@ def partition(*, data, head, tail, drawData , update_Matryki):
         )
     if not Pauza_Krok():
         return None
-    time.sleep(gb.time_tick)
+    if not gb.Czekaj():
+        return None
 
 
     #  ---- Swap pivota "Green" kolor ---- 
@@ -69,7 +71,8 @@ def partition(*, data, head, tail, drawData , update_Matryki):
         )
     if not Pauza_Krok():
         return None
-    time.sleep(gb.time_tick)
+    if not gb.Czekaj():
+        return None
 
     # przenosimy pivot na koniec (tail)
     data[pivot_index], data[tail] = data[tail], data[pivot_index]
@@ -88,7 +91,8 @@ def partition(*, data, head, tail, drawData , update_Matryki):
     drawData(data=data, colorArray=getColorArray(dataLen=len(data), head=head, tail=tail, border=border, currentIndex=border) )
     if not Pauza_Krok():
         return None
-    time.sleep(gb.time_tick)
+    if not gb.Czekaj():
+        return None
 
     for i in range(head, tail):
 
@@ -99,7 +103,8 @@ def partition(*, data, head, tail, drawData , update_Matryki):
 
         # --- Aby widziec index kazdy raz ---
         drawData(data=data, colorArray=getColorArray(dataLen=len(data), head=head, tail=tail, border=border, currentIndex=i, isSwaping=False))
-        time.sleep(gb.time_tick)
+        if not gb.Czekaj():
+            return None
 
         gb.porownanie += 1
 
@@ -110,7 +115,8 @@ def partition(*, data, head, tail, drawData , update_Matryki):
             drawData(data=data, colorArray=getColorArray(dataLen=len(data), head=head, tail=tail, border=border, currentIndex= i, isSwaping= True) )
             if not Pauza_Krok():
                 return None
-            time.sleep(gb.time_tick)
+            if not gb.Czekaj():
+                return None
 
             data[border], data[i] = data[i], data[border]
 
@@ -124,7 +130,8 @@ def partition(*, data, head, tail, drawData , update_Matryki):
             drawData(data=data, colorArray=getColorArray(dataLen=len(data), head=head, tail=tail, border=border, currentIndex= i) )
             if not Pauza_Krok():
                 return None
-            time.sleep(gb.time_tick)
+            if not gb.Czekaj():
+                return None
 
         # -- Aktualizacja metryk --
         czas = time.time() - gb.czas_startu
@@ -136,7 +143,8 @@ def partition(*, data, head, tail, drawData , update_Matryki):
     if not Pauza_Krok():
         return None
     
-    time.sleep(gb.time_tick)
+    if not gb.Czekaj():
+        return None
     data[border], data[tail] = data[tail], data[border]
 
     # -- Finalna Aktualizacja Metryk --

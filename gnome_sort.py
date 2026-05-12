@@ -11,7 +11,7 @@ def gnome_sort(*, data, drawData, update_Matryki):
         if not Pauza_Krok(): return None
         
         drawData(data=data, colorArray=["yellow" if x == index else "red" for x in range(n)])
-        time.sleep(gb.time_tick)
+        if not gb.Czekaj(): return None
         
         gb.porownanie += 1
         if index == 0:

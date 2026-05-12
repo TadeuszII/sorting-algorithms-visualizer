@@ -12,7 +12,7 @@ def selection_sort(*, data, drawData, update_Matryki):
             
             gb.porownanie += 1
             drawData(data=data, colorArray=["yellow" if x == min_idx else "green" if x == j else "red" for x in range(len(data))])
-            time.sleep(gb.time_tick)
+            if not gb.Czekaj(): return None
             if not Pauza_Krok(): return None
 
             if data[j] < data[min_idx]:

@@ -15,7 +15,7 @@ def odd_even_sort(*, data, drawData, update_Matryki):
         # --- nieparzyste ---
         for i in range(1, n - 1, 2):
             drawData(data=data, colorArray=["blue" if x == i or x == i+1 else "red" for x in range(len(data))])
-            time.sleep(gb.time_tick)
+            if not gb.Czekaj(): return None
             if not Pauza_Krok(): return None
             
             gb.porownanie += 1
@@ -31,7 +31,7 @@ def odd_even_sort(*, data, drawData, update_Matryki):
         # --- parzyste ---
         for i in range(0, n - 1, 2):
             drawData(data=data, colorArray=["green" if x == i or x == i+1 else "red" for x in range(len(data))])
-            time.sleep(gb.time_tick)
+            if not gb.Czekaj(): return None
             if not Pauza_Krok(): return None
             
             gb.porownanie += 1

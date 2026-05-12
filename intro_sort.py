@@ -44,7 +44,7 @@ def insertion_sort_range(data, start, end, drawData, update_Matryki):
                     colorArray.append("red")     # Niesortowana partycja
 
             drawData(data=data, colorArray=colorArray)
-            time.sleep(gb.time_tick)
+            if not gb.Czekaj(): return False
             
             data[j + 1] = data[j]
             gb.zapisy += 1
@@ -87,7 +87,7 @@ def heapify_range(data, n, i, start, end_range, drawData, update_Matryki):
             colorArray.append("red")    # poza zakresem
             
     drawData(data=data, colorArray=colorArray)
-    time.sleep(gb.time_tick)
+    if not gb.Czekaj(): return False
 
     if left < heap_end_idx:
         gb.porownanie += 1
@@ -144,7 +144,7 @@ def heap_sort_range(data, start, end, drawData, update_Matryki):
                 colorArray.append("red")    # Pozostała sterta
 
         drawData(data=data, colorArray=colorArray)
-        time.sleep(gb.time_tick)
+        if not gb.Czekaj(): return False
         
         # Restore heap property
         if heapify_range(data, current_heap_size, start, start, end, drawData, update_Matryki) is False: return False
@@ -189,7 +189,7 @@ def partition(data, head, tail, drawData, update_Matryki):
     # Initial Draw
     drawData(data=data, colorArray=getColorArray(dataLen=len(data), head=head, tail=tail, border=border, currentIndex=border))
     if not Pauza_Krok(): return None
-    time.sleep(gb.time_tick)
+    if not gb.Czekaj(): return None
 
     for i in range(head, tail):
         # --- Pauza / krok ---
@@ -197,7 +197,7 @@ def partition(data, head, tail, drawData, update_Matryki):
 
         # --- Aby widziec index kazdy raz ---
         drawData(data=data, colorArray=getColorArray(dataLen=len(data), head=head, tail=tail, border=border, currentIndex=i, isSwaping=False))
-        time.sleep(gb.time_tick)
+        if not gb.Czekaj(): return None
 
         gb.porownanie += 1
 
@@ -205,7 +205,7 @@ def partition(data, head, tail, drawData, update_Matryki):
             # -- Change Color in the swap -- 
             drawData(data=data, colorArray=getColorArray(dataLen=len(data), head=head, tail=tail, border=border, currentIndex=i, isSwaping=True))
             if not Pauza_Krok(): return None
-            time.sleep(gb.time_tick)
+            if not gb.Czekaj(): return None
 
             data[border], data[i] = data[i], data[border]
 
@@ -217,7 +217,7 @@ def partition(data, head, tail, drawData, update_Matryki):
 
             drawData(data=data, colorArray=getColorArray(dataLen=len(data), head=head, tail=tail, border=border, currentIndex=i))
             if not Pauza_Krok(): return None
-            time.sleep(gb.time_tick)
+            if not gb.Czekaj(): return None
 
         # -- Aktualizacja metryk --
         czas = time.time() - gb.czas_startu
@@ -225,7 +225,7 @@ def partition(data, head, tail, drawData, update_Matryki):
 
     # --- Swap pivot with border value ---
     drawData(data=data, colorArray=getColorArray(dataLen=len(data), head=head, tail=tail, border=border, currentIndex=tail, isSwaping=True))
-    time.sleep(gb.time_tick)
+    if not gb.Czekaj(): return None
     
     data[border], data[tail] = data[tail], data[border]
 

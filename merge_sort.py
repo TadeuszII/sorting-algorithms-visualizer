@@ -39,7 +39,7 @@ def merge(data, start, mid, end, drawData, update_Matryki):
 
         # --- Show current index (Yellow) ---
         drawData(data=data, colorArray=getColorArray(len(data), start, end, k, isSwaping=False))
-        time.sleep(gb.time_tick)
+        if not gb.Czekaj(): return False
 
         gb.porownanie += 1
         
@@ -60,7 +60,7 @@ def merge(data, start, mid, end, drawData, update_Matryki):
         
         drawData(data=data, colorArray=getColorArray(len(data), start, end, k, isSwaping=True))
         if not Pauza_Krok(): return False
-        time.sleep(gb.time_tick)
+        if not gb.Czekaj(): return False
 
         # -- Aktualizacja metryk --
         czas = time.time() - gb.czas_startu
@@ -73,14 +73,14 @@ def merge(data, start, mid, end, drawData, update_Matryki):
         if not Pauza_Krok(): return False
         
         drawData(data=data, colorArray=getColorArray(len(data), start, end, k, isSwaping=False))
-        time.sleep(gb.time_tick)
+        if not gb.Czekaj(): return False
 
         data[k] = left_part[i]
         gb.zapisy += 1
         gb.zmiany += 1
         
         drawData(data=data, colorArray=getColorArray(len(data), start, end, k, isSwaping=True))
-        time.sleep(gb.time_tick)
+        if not gb.Czekaj(): return False
         
         i += 1
         k += 1
@@ -93,14 +93,14 @@ def merge(data, start, mid, end, drawData, update_Matryki):
         if not Pauza_Krok(): return False
         
         drawData(data=data, colorArray=getColorArray(len(data), start, end, k, isSwaping=False))
-        time.sleep(gb.time_tick)
+        if not gb.Czekaj(): return False
 
         data[k] = right_part[j]
         gb.zapisy += 1
         gb.zmiany += 1
         
         drawData(data=data, colorArray=getColorArray(len(data), start, end, k, isSwaping=True))
-        time.sleep(gb.time_tick)
+        if not gb.Czekaj(): return False
         
         j += 1
         k += 1

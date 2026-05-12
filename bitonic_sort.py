@@ -6,7 +6,7 @@ def compAndSwap(data, i, j, dire, drawData, update_Matryki):
     if not Pauza_Krok(): return False
     
     drawData(data=data, colorArray=["yellow" if x == i or x == j else "red" for x in range(len(data))])
-    time.sleep(gb.time_tick)
+    if not gb.Czekaj(): return False
     if not Pauza_Krok(): return False
     
     gb.porownanie += 1

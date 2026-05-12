@@ -28,7 +28,7 @@ def shell_sort(*, data, drawData, update_Matryki):
                     colorArray.append("white")  # Tło
             
             drawData(data=data, colorArray=colorArray)
-            time.sleep(gb.time_tick)
+            if not gb.Czekaj(): return None
 
             # --- Pętla przesuwająca elementy (Insertion Sort z odstępem) ---
             while j >= gap:
@@ -50,7 +50,7 @@ def shell_sort(*, data, drawData, update_Matryki):
                 
                 drawData(data=data, colorArray=colorArray)
                 if not Pauza_Krok(): return None
-                time.sleep(gb.time_tick)
+                if not gb.Czekaj(): return None
                 
                 # --- Przesunięcie ---
                 data[j] = data[j - gap]
@@ -60,7 +60,7 @@ def shell_sort(*, data, drawData, update_Matryki):
                 # Wizualizacja po przesunięciu (Flash na zielono)
                 colorArray[j] = "green" 
                 drawData(data=data, colorArray=colorArray)
-                time.sleep(gb.time_tick)
+                if not gb.Czekaj(): return None
 
                 j -= gap
                 
@@ -84,7 +84,7 @@ def shell_sort(*, data, drawData, update_Matryki):
 
             drawData(data=data, colorArray=colorArray)
             if not Pauza_Krok(): return None
-            time.sleep(gb.time_tick)
+            if not gb.Czekaj(): return None
 
             czas = time.time() - gb.czas_startu
             update_Matryki(porownanie=gb.porownanie, zmiany=gb.zmiany, zapisy=gb.zapisy, czas=czas)

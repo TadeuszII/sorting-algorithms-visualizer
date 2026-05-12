@@ -21,7 +21,7 @@ def heapify(data, n, i, drawData, update_Matryki):
             colorArray.append("red")    # Reszta nieposortowanego kopca
 
     drawData(data=data, colorArray=colorArray)
-    time.sleep(gb.time_tick)
+    if not gb.Czekaj(): return False
 
     if left < n:
         gb.porownanie += 1
@@ -63,7 +63,7 @@ def heap_sort(*, data, drawData, update_Matryki):
         
         # Element na końcu [i] jest posortowany olor niebieski
         drawData(data=data, colorArray=["green" if x == i else "blue" if x > i else "red" for x in range(len(data))])
-        time.sleep(gb.time_tick)
+        if not gb.Czekaj(): return None
         
         if heapify(data, i, 0, drawData, update_Matryki) is False: return None
         

@@ -32,7 +32,7 @@ def insertion_sort(*, data, drawData, update_Matryki):
                     colorArray.append("red")      # Niesortowana partycja
 
             drawData(data=data, colorArray=colorArray)
-            time.sleep(gb.time_tick)
+            if not gb.Czekaj(): return None
             if not Pauza_Krok(): return None
             
             data[j + 1] = data[j]

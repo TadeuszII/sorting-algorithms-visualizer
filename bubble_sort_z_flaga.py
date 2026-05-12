@@ -36,7 +36,8 @@ def bubble_sort_z_flaga(*, data, drawData, update_Matryki) -> list:
             
             if not Pauza_Krok():
                 return None
-            time.sleep(gb.time_tick)
+            if not gb.Czekaj():
+                return None
 
         # Aktualizacja metryk po zakończeniu pętli wewnętrznej
         czas = time.time() - gb.czas_startu

@@ -87,6 +87,12 @@ logo_Uniweretetu = PhotoImage(file=resource_path("filia_wilno_logo_kolor.png")).
 
 # --- Przycisk pauzy ---
 def pauza_Button():
+    if gb.tryb_krokowy:
+        gb.tryb_krokowy = False
+        gb.pauza = False
+        gb.krok = False
+        gb.time_tick = speedScale.get()
+        return
     
     gb.pauza = not gb.pauza # -- Switch --
 
@@ -98,7 +104,16 @@ def pauza_Button():
 
 # --- Przycisk kroku ---
 def krok_Button():
-    gb.krok = True
+    if gb.sortowanie:
+        gb.tryb_krokowy = True
+        gb.pauza = True
+        gb.krok = True
+        return
+
+    if not data:
+        return
+
+    StartAlgorithm(step_mode=True)
 
 
 # --- Przycisk reset ---
@@ -109,6 +124,7 @@ def resetuj_Sort_Button():
     gb.stop_signal = True
     gb.pauza = False
     gb.krok = False
+    gb.tryb_krokowy = False
     gb.sortowanie = False
     sort_run_id += 1
 
@@ -135,6 +151,7 @@ def delete_Button():
     gb.stop_signal = True
     gb.pauza = False
     gb.krok = False
+    gb.tryb_krokowy = False
     gb.sortowanie = False
     sort_run_id += 1
 
@@ -177,7 +194,7 @@ def set_sort_controls_locked(locked: bool):
         widget.config(state=combo_state)
 
 
-def start_sort_thread(target, **extra_kwargs):
+def start_sort_thread(target, step_mode=False, **extra_kwargs):
     global sort_run_id
 
     sort_run_id += 1
@@ -185,8 +202,9 @@ def start_sort_thread(target, **extra_kwargs):
 
     gb.stop_signal = False
     gb.sortowanie = True
-    gb.pauza = False
-    gb.krok = False
+    gb.tryb_krokowy = step_mode
+    gb.pauza = step_mode
+    gb.krok = step_mode
 
     gb.porownanie = 0
     gb.zmiany = 0
@@ -211,6 +229,7 @@ def start_sort_thread(target, **extra_kwargs):
                     return
 
                 gb.sortowanie = False
+                gb.tryb_krokowy = False
                 if not gb.stop_signal:
                     set_sort_controls_locked(False)
 
@@ -438,7 +457,7 @@ def Export_button():
 
 
 # --- Funckja Startu algortymu ---
-def StartAlgorithm():
+def StartAlgorithm(step_mode=False):
     global data
 
     gb.time_tick = speedScale.get() # -- biora aktualny czas --
@@ -450,22 +469,22 @@ def StartAlgorithm():
 
     match algMenu.get():
         case "Median of three":
-            start_sort_thread(quick_sort_median_of_three, head=0, tail=len(data) - 1)
+            start_sort_thread(quick_sort_median_of_three, step_mode=step_mode, head=0, tail=len(data) - 1)
 
         case "Quick Sort":
-            start_sort_thread(quick_sort, head=0, tail=len(data) - 1)
+            start_sort_thread(quick_sort, step_mode=step_mode, head=0, tail=len(data) - 1)
         
         case "Bubble Sort":
-            start_sort_thread(bubble_sort)
+            start_sort_thread(bubble_sort, step_mode=step_mode)
         
         case "Cocktail Shaker Sort":
-            start_sort_thread(cocktail_shaker_sort)
+            start_sort_thread(cocktail_shaker_sort, step_mode=step_mode)
 
         case "Odd Even Sort":
-            start_sort_thread(odd_even_sort)
+            start_sort_thread(odd_even_sort, step_mode=step_mode)
         
         case "Gnome Sort":
-            start_sort_thread(gnome_sort)
+            start_sort_thread(gnome_sort, step_mode=step_mode)
         
         case "Bitonic Sort":
             rozmiar = len(data)
@@ -475,28 +494,28 @@ def StartAlgorithm():
                 isPowerOfTwo = False
                 showinfo(title="Ostrzeżenie: Bitonic Sort", message=f"Wybrano rozmiar: {rozmiar}, ale Bitonic Sort\nwymaga, aby liczba elementów była potęgą 2\n (np. 8, 16, 32, 64, 128).\n Próbka zostanie nie poprawnie posortowana" )
             
-            start_sort_thread(bitonic_sort, isPowerOfTwo=isPowerOfTwo)
+            start_sort_thread(bitonic_sort, step_mode=step_mode, isPowerOfTwo=isPowerOfTwo)
 
         case "Shell Sort":
-            start_sort_thread(shell_sort)
+            start_sort_thread(shell_sort, step_mode=step_mode)
         
         case "Heap Sort":
-            start_sort_thread(heap_sort)
+            start_sort_thread(heap_sort, step_mode=step_mode)
 
         case "Selection Sort":
-            start_sort_thread(selection_sort)
+            start_sort_thread(selection_sort, step_mode=step_mode)
 
         case "Insertion Sort":
-            start_sort_thread(insertion_sort)
+            start_sort_thread(insertion_sort, step_mode=step_mode)
         
         case "Intro Sort":
-            start_sort_thread(intro_sort)
+            start_sort_thread(intro_sort, step_mode=step_mode)
 
         case "Merge Sort":
-            start_sort_thread(merge_sort)
+            start_sort_thread(merge_sort, step_mode=step_mode)
 
         case "Bubble Sort Flag":
-            start_sort_thread(bubble_sort_z_flaga)
+            start_sort_thread(bubble_sort_z_flaga, step_mode=step_mode)
 
         case SEPERATOR:
             showinfo(title="Uwaga", message=f"Nie można wybrać seperator jako algortym do sortowania")
