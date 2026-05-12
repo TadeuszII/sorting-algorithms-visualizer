@@ -31,8 +31,10 @@ def shell_sort(*, data, drawData, update_Matryki):
             time.sleep(gb.time_tick)
 
             # --- Pętla przesuwająca elementy (Insertion Sort z odstępem) ---
-            gb.porownanie += 1
-            while j >= gap and data[j - gap] > temp:
+            while j >= gap:
+                gb.porownanie += 1
+                if data[j - gap] <= temp:
+                    break
                 
                 # Wizualizacja przed przesunięciem
                 colorArray = []
@@ -66,10 +68,6 @@ def shell_sort(*, data, drawData, update_Matryki):
                 czas = time.time() - gb.czas_startu
                 update_Matryki(porownanie=gb.porownanie, zmiany=gb.zmiany, zapisy=gb.zapisy, czas=czas)
                 
-                # Dodatkowe porównanie w pętli while (jeśli nie wyjdziemy z pętli)
-                if j >= gap:
-                    gb.porownanie += 1
-
             # --- Wstawienie elementu na właściwe miejsce ---
             data[j] = temp
             gb.zapisy += 1

@@ -68,6 +68,10 @@ selected_genMenu = StringVar()
 
 # --- Lista z danymi ---
 data = []
+kopia_daty = []
+sort_locked_widgets = []
+sort_locked_comboboxes = []
+sort_run_id = 0
 
 
 # --- Logo uniwersytetu ---
@@ -99,13 +103,14 @@ def krok_Button():
 
 # --- Przycisk reset ---
 def resetuj_Sort_Button():
-    global data, kopia_daty
+    global data, kopia_daty, sort_run_id
 
     # -- zatrzymanie działania algorytmu --
     gb.stop_signal = True
     gb.pauza = False
     gb.krok = False
     gb.sortowanie = False
+    sort_run_id += 1
 
     # -- wyzerowanie metryk --
     gb.zapisy = 0
@@ -114,6 +119,7 @@ def resetuj_Sort_Button():
     gb.porownanie = 0
 
     update_Matryki( porownanie=gb.porownanie, zapisy=gb.zapisy, zmiany=gb.zmiany, czas=gb.czas_startu)
+    set_sort_controls_locked(False)
 
     # -- Sprawdzenie czy kopia_daty nie jest pusta --
     if kopia_daty:
@@ -123,13 +129,14 @@ def resetuj_Sort_Button():
 
 # --- Przycisk delete ---
 def delete_Button():
-    global data, kopia_daty
+    global data, kopia_daty, sort_run_id
 
     # -- zatrzymanie działania algorytmu --
     gb.stop_signal = True
     gb.pauza = False
     gb.krok = False
     gb.sortowanie = False
+    sort_run_id += 1
 
     #  -- wyzerowanie metryk --
     gb.zapisy = 0
@@ -138,6 +145,7 @@ def delete_Button():
     gb.porownanie = 0
 
     update_Matryki(porownanie=0, zmiany=0, zapisy=0, czas=0)
+    set_sort_controls_locked(False)
 
     # -- CZYSZCZENIE CANVASA --
     canvas.delete("all")
@@ -156,6 +164,59 @@ def update_Matryki(*,porownanie, zmiany, zapisy, czas):
     label_porownan.config(text=f"Porownania: {porownanie}")
     label_zamian_i_zapisow.config(text=f"Zamiany/Zapisy: {zmiany+zapisy}")
     label_czasu.config(text=f"Czas: {czas:.3f} s")
+
+
+def set_sort_controls_locked(locked: bool):
+    state = DISABLED if locked else NORMAL
+    combo_state = "disabled" if locked else "readonly"
+
+    for widget in sort_locked_widgets:
+        widget.config(state=state)
+
+    for widget in sort_locked_comboboxes:
+        widget.config(state=combo_state)
+
+
+def start_sort_thread(target, **extra_kwargs):
+    global sort_run_id
+
+    sort_run_id += 1
+    current_run_id = sort_run_id
+
+    gb.stop_signal = False
+    gb.sortowanie = True
+    gb.pauza = False
+    gb.krok = False
+
+    gb.porownanie = 0
+    gb.zmiany = 0
+    gb.zapisy = 0
+    gb.czas_startu = time.time()
+
+    set_sort_controls_locked(True)
+
+    kwargs = {
+        "data": data,
+        "drawData": drawData,
+        "update_Matryki": update_Matryki,
+        **extra_kwargs
+    }
+
+    def sort_runner():
+        try:
+            target(**kwargs)
+        finally:
+            def finish_sort():
+                if current_run_id != sort_run_id:
+                    return
+
+                gb.sortowanie = False
+                if not gb.stop_signal:
+                    set_sort_controls_locked(False)
+
+            root.after(0, finish_sort)
+
+    threading.Thread(target=sort_runner, daemon=True).start()
 
 # --- Funckja Rysowania ---
 def drawData(*, data, colorArray):
@@ -379,92 +440,32 @@ def Export_button():
 # --- Funckja Startu algortymu ---
 def StartAlgorithm():
     global data
-    global aktualny_timeTick 
 
     gb.time_tick = speedScale.get() # -- biora aktualny czas --
+
+    if gb.sortowanie:
+        return
 
     if not data: return # -- jezeli nie zostalo nic sgenerowano nic nie robi --
 
     match algMenu.get():
         case "Median of three":
-            gb.stop_signal = False
-            gb.sortowanie = True
-            gb.pauza = False
-            gb.krok = False
-
-            gb.porownanie = 0
-            gb.zmiany = 0
-            gb.zapisy = 0
-            gb.czas_startu = time.time()
-
-            threading.Thread(target=quick_sort_median_of_three, kwargs={"data": data, "head": 0, "tail": len(data) - 1, "drawData": drawData,
-            "update_Matryki":update_Matryki }, daemon=True).start()
+            start_sort_thread(quick_sort_median_of_three, head=0, tail=len(data) - 1)
 
         case "Quick Sort":
-            gb.stop_signal = False
-            gb.sortowanie = True
-            gb.pauza = False
-            gb.krok = False
-
-            gb.porownanie = 0
-            gb.zmiany = 0
-            gb.zapisy = 0
-            gb.czas_startu = time.time()
-
-            threading.Thread(target=quick_sort, kwargs={"data": data, "head": 0, "tail": len(data) - 1, "drawData": drawData, 
-            "update_Matryki":update_Matryki }, daemon=True).start()
+            start_sort_thread(quick_sort, head=0, tail=len(data) - 1)
         
         case "Bubble Sort":
-            gb.stop_signal = False
-            gb.sortowanie = True
-            gb.pauza = False
-            gb.krok = False
-
-            gb.porownanie = 0
-            gb.zmiany = 0
-            gb.zapisy = 0
-            gb.czas_startu = time.time()
-            threading.Thread(target=bubble_sort, kwargs={"data": data, "drawData": drawData, 
-            "update_Matryki":update_Matryki} ,daemon=True).start()
+            start_sort_thread(bubble_sort)
         
         case "Cocktail Shaker Sort":
-            gb.stop_signal = False
-            gb.sortowanie = True
-            gb.pauza = False
-            gb.krok = False
-
-            gb.porownanie = 0
-            gb.zmiany = 0
-            gb.zapisy = 0
-            gb.czas_startu = time.time()
-            threading.Thread(target=cocktail_shaker_sort, kwargs={"data": data, "drawData": drawData, 
-            "update_Matryki":update_Matryki} ,daemon=True).start()
+            start_sort_thread(cocktail_shaker_sort)
 
         case "Odd Even Sort":
-            gb.stop_signal = False
-            gb.sortowanie = True
-            gb.pauza = False
-            gb.krok = False
-
-            gb.porownanie = 0
-            gb.zmiany = 0
-            gb.zapisy = 0
-            gb.czas_startu = time.time()
-            threading.Thread(target=odd_even_sort, kwargs={"data": data, "drawData": drawData, 
-            "update_Matryki":update_Matryki} ,daemon=True).start()
+            start_sort_thread(odd_even_sort)
         
         case "Gnome Sort":
-            gb.stop_signal = False
-            gb.sortowanie = True
-            gb.pauza = False
-            gb.krok = False
-
-            gb.porownanie = 0
-            gb.zmiany = 0
-            gb.zapisy = 0
-            gb.czas_startu = time.time()
-            threading.Thread(target=gnome_sort, kwargs={"data": data, "drawData": drawData, 
-            "update_Matryki":update_Matryki} ,daemon=True).start()
+            start_sort_thread(gnome_sort)
         
         case "Bitonic Sort":
             rozmiar = len(data)
@@ -474,108 +475,28 @@ def StartAlgorithm():
                 isPowerOfTwo = False
                 showinfo(title="Ostrzeżenie: Bitonic Sort", message=f"Wybrano rozmiar: {rozmiar}, ale Bitonic Sort\nwymaga, aby liczba elementów była potęgą 2\n (np. 8, 16, 32, 64, 128).\n Próbka zostanie nie poprawnie posortowana" )
             
-            gb.stop_signal = False
-            gb.sortowanie = True
-            gb.pauza = False
-            gb.krok = False
-
-            gb.porownanie = 0
-            gb.zmiany = 0
-            gb.zapisy = 0
-            gb.czas_startu = time.time()
-            threading.Thread(target=bitonic_sort, kwargs={"data": data, "drawData": drawData, 
-            "update_Matryki":update_Matryki, "isPowerOfTwo":isPowerOfTwo} ,daemon=True).start()
+            start_sort_thread(bitonic_sort, isPowerOfTwo=isPowerOfTwo)
 
         case "Shell Sort":
-            gb.stop_signal = False
-            gb.sortowanie = True
-            gb.pauza = False
-            gb.krok = False
-
-            gb.porownanie = 0
-            gb.zmiany = 0
-            gb.zapisy = 0
-            gb.czas_startu = time.time()
-            threading.Thread(target=shell_sort, kwargs={"data": data, "drawData": drawData, 
-            "update_Matryki":update_Matryki} ,daemon=True).start()
+            start_sort_thread(shell_sort)
         
         case "Heap Sort":
-            gb.stop_signal = False
-            gb.sortowanie = True
-            gb.pauza = False
-            gb.krok = False
-
-            gb.porownanie = 0
-            gb.zmiany = 0
-            gb.zapisy = 0
-            gb.czas_startu = time.time()
-            threading.Thread(target=heap_sort, kwargs={"data": data, "drawData": drawData, 
-            "update_Matryki":update_Matryki} ,daemon=True).start()
+            start_sort_thread(heap_sort)
 
         case "Selection Sort":
-            gb.stop_signal = False
-            gb.sortowanie = True
-            gb.pauza = False
-            gb.krok = False
-
-            gb.porownanie = 0
-            gb.zmiany = 0
-            gb.zapisy = 0
-            gb.czas_startu = time.time()
-            threading.Thread(target=selection_sort, kwargs={"data": data, "drawData": drawData, 
-            "update_Matryki":update_Matryki} ,daemon=True).start()
+            start_sort_thread(selection_sort)
 
         case "Insertion Sort":
-            gb.stop_signal = False
-            gb.sortowanie = True
-            gb.pauza = False
-            gb.krok = False
-
-            gb.porownanie = 0
-            gb.zmiany = 0
-            gb.zapisy = 0
-            gb.czas_startu = time.time()
-            threading.Thread(target=insertion_sort, kwargs={"data": data, "drawData": drawData, 
-            "update_Matryki":update_Matryki} ,daemon=True).start()
+            start_sort_thread(insertion_sort)
         
         case "Intro Sort":
-            gb.stop_signal = False
-            gb.sortowanie = True
-            gb.pauza = False
-            gb.krok = False
-
-            gb.porownanie = 0
-            gb.zmiany = 0
-            gb.zapisy = 0
-            gb.czas_startu = time.time()
-            threading.Thread(target=intro_sort, kwargs={"data": data, "drawData": drawData, 
-            "update_Matryki":update_Matryki} ,daemon=True).start()
+            start_sort_thread(intro_sort)
 
         case "Merge Sort":
-            gb.stop_signal = False
-            gb.sortowanie = True
-            gb.pauza = False
-            gb.krok = False
-
-            gb.porownanie = 0
-            gb.zmiany = 0
-            gb.zapisy = 0
-            gb.czas_startu = time.time()
-            threading.Thread(target=merge_sort, kwargs={"data": data, "drawData": drawData, 
-            "update_Matryki":update_Matryki} ,daemon=True).start()
+            start_sort_thread(merge_sort)
 
         case "Bubble Sort Flag":
-            gb.stop_signal = False
-            gb.sortowanie = True
-            gb.pauza = False
-            gb.krok = False
-
-            gb.porownanie = 0
-            gb.zmiany = 0
-            gb.zapisy = 0
-            gb.czas_startu = time.time()
-            threading.Thread(target=bubble_sort_z_flaga, kwargs={"data": data, "drawData": drawData, 
-            "update_Matryki":update_Matryki} ,daemon=True).start()
+            start_sort_thread(bubble_sort_z_flaga)
 
         case SEPERATOR:
             showinfo(title="Uwaga", message=f"Nie można wybrać seperator jako algortym do sortowania")
@@ -630,14 +551,22 @@ styl_przycisku2 = {
 }
 
 # -- Przyciski/Buttons--
-Button(sidebar, text="Start", command=StartAlgorithm, **styl_przycisku).grid(row=5, column=0, columnspan=2, pady=(10,4)) # - Start -
-Button(sidebar, text="Stop / Wznow", command=pauza_Button, **styl_przycisku).grid(row=6, column=0, columnspan=2, pady=4) # - Pauza/wznow -
-Button(sidebar, text="Krok", command=krok_Button, **styl_przycisku).grid(row=7, column=0, columnspan=2, pady=4) # - Krok -
-Button(sidebar, text="Reset", command=resetuj_Sort_Button, **styl_przycisku).grid(row=8, column=0, columnspan=2, pady=4, padx=4) # - Reset -
-Button(sidebar, text="Delete", command=delete_Button, **styl_przycisku2).grid(row=8, column=1, columnspan=2, pady=4, padx=4) # - Delete -
-Button(sidebar, text="Generuj", command=Generate, **styl_przycisku).grid(row=15, column=0, columnspan=1, pady=5) # - Generuj -
-Button(sidebar, text="Open", command=Open_button, **styl_przycisku2).grid(row=15, column=1, columnspan=1, pady=5) # - Open -
-Button(sidebar, text="Export", command=Export_button, **styl_przycisku2).grid(row=16, column=1, columnspan=1, pady=10) # - Open -
+start_button = Button(sidebar, text="Start", command=StartAlgorithm, **styl_przycisku)
+start_button.grid(row=5, column=0, columnspan=2, pady=(10,4)) # - Start -
+pause_button = Button(sidebar, text="Stop / Wznow", command=pauza_Button, **styl_przycisku)
+pause_button.grid(row=6, column=0, columnspan=2, pady=4) # - Pauza/wznow -
+step_button = Button(sidebar, text="Krok", command=krok_Button, **styl_przycisku)
+step_button.grid(row=7, column=0, columnspan=2, pady=4) # - Krok -
+reset_button = Button(sidebar, text="Reset", command=resetuj_Sort_Button, **styl_przycisku)
+reset_button.grid(row=8, column=0, columnspan=2, pady=4, padx=4) # - Reset -
+delete_button = Button(sidebar, text="Delete", command=delete_Button, **styl_przycisku2)
+delete_button.grid(row=8, column=1, columnspan=2, pady=4, padx=4) # - Delete -
+generate_button = Button(sidebar, text="Generuj", command=Generate, **styl_przycisku)
+generate_button.grid(row=15, column=0, columnspan=1, pady=5) # - Generuj -
+open_button = Button(sidebar, text="Open", command=Open_button, **styl_przycisku2)
+open_button.grid(row=15, column=1, columnspan=1, pady=5) # - Open -
+export_button = Button(sidebar, text="Export", command=Export_button, **styl_przycisku2)
+export_button.grid(row=16, column=1, columnspan=1, pady=10) # - Open -
 # ---- /Przyciski ---- 
 
 # ---- Suwaki dla Predskoc/Liczb Elementow[n]/Min wartosc elementa/Min wartosc elementa ----
@@ -664,6 +593,8 @@ min_Entry.grid(row=12, column=0, columnspan=2, pady=3)
 Label(sidebar, text="Max wartość:", **font_teksta_suwaka).grid(row=13, column=0, sticky="w")
 max_Entry = Scale(sidebar, from_=10, to=1000, length=170, resolution=1, orient=HORIZONTAL, bg="white")
 max_Entry.grid(row=14, column=0, columnspan=2, pady=3)
+sort_locked_widgets = [start_button, generate_button, open_button, export_button, rozmiar_Entry, min_Entry, max_Entry]
+sort_locked_comboboxes = [algMenu, genMenu]
 # --- /Suwaki dla Liczb Elementow[n]/Min wartosc elementa/Min wartosc elementa ---
 
 

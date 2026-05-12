@@ -23,13 +23,15 @@ def heapify(data, n, i, drawData, update_Matryki):
     drawData(data=data, colorArray=colorArray)
     time.sleep(gb.time_tick)
 
-    gb.porownanie += 1
-    if left < n and data[left] > data[largest]:
-        largest = left
+    if left < n:
+        gb.porownanie += 1
+        if data[left] > data[largest]:
+            largest = left
 
-    gb.porownanie += 1
-    if right < n and data[right] > data[largest]:
-        largest = right
+    if right < n:
+        gb.porownanie += 1
+        if data[right] > data[largest]:
+            largest = right
 
     if largest != i:
         data[i], data[largest] = data[largest], data[i]

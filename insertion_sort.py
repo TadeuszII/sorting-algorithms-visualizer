@@ -13,8 +13,10 @@ def insertion_sort(*, data, drawData, update_Matryki):
         
         drawData(data=data, colorArray=["yellow" if x == i else "blue" if x < i else "red" for x in range(len(data))])
 
-        while j >= 0 and data[j] > key:
+        while j >= 0:
             gb.porownanie += 1
+            if data[j] <= key:
+                break
 
             if not Pauza_Krok(): return None
 

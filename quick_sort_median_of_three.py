@@ -40,7 +40,6 @@ def partition(*, data, head, tail, drawData , update_Matryki):
         pivot_index = tail
     
     gb.porownanie += 3 # dodajem porownanie
-    gb.zapisy += 1
     
     # ---- Wybrany pivot "Pink" ----
     if gb.time_tick >= czas_niema_anim:

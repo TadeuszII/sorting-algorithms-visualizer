@@ -25,8 +25,10 @@ def insertion_sort_range(data, start, end, drawData, update_Matryki):
         
         drawData(data=data, colorArray=colorArray)
 
-        while j >= start and data[j] > key:
+        while j >= start:
             gb.porownanie += 1
+            if data[j] <= key:
+                break
             if not Pauza_Krok(): return False
             
             # Z 
@@ -87,13 +89,15 @@ def heapify_range(data, n, i, start, end_range, drawData, update_Matryki):
     drawData(data=data, colorArray=colorArray)
     time.sleep(gb.time_tick)
 
-    gb.porownanie += 1
-    if left < heap_end_idx and data[left] > data[largest]:
-        largest = left
+    if left < heap_end_idx:
+        gb.porownanie += 1
+        if data[left] > data[largest]:
+            largest = left
 
-    gb.porownanie += 1
-    if right < heap_end_idx and data[right] > data[largest]:
-        largest = right
+    if right < heap_end_idx:
+        gb.porownanie += 1
+        if data[right] > data[largest]:
+            largest = right
 
     if largest != i:
         data[i], data[largest] = data[largest], data[i]
