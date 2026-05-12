@@ -379,7 +379,6 @@ def Export_button():
 # --- Funckja Startu algortymu ---
 def StartAlgorithm():
     global data
-    rozmiar = rozmiar_Entry.get()
     global aktualny_timeTick 
 
     gb.time_tick = speedScale.get() # -- biora aktualny czas --
@@ -468,6 +467,7 @@ def StartAlgorithm():
             "update_Matryki":update_Matryki} ,daemon=True).start()
         
         case "Bitonic Sort":
+            rozmiar = len(data)
             isPowerOfTwo = True
             # -- Jezeli user wybral bitonic sort ale dlugosc daty nie potega 2 --
             if not ( (rozmiar & (rozmiar - 1)) == 0 ):
