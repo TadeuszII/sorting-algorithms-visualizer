@@ -314,21 +314,45 @@ def Open_button():
 
 
     fileName = fd.askopenfilename(title="Wybierz plik CSV", initialdir="/", filetypes=[("Pliki CSV", "*.csv")]) # -- askopenfilename prosi nazwa file dla odkrycia --
+    if not fileName:
+        return
+
+    nowa_data = []
+    puste_wiersze = 0
+    niepoprawne_wiersze = 0
+    ujemne_liczby = 0
+
     with open(fileName, newline='') as csvfile:
         reader = csv.reader(csvfile)
 
-        komunikat_o_negatywnych_liczbach = False # -- Flaga dla pokyzwania komunikatu tylko raz --
         for row in reader:
-            if row != None and not(int(row[0]) < 0): # -- Jezeli data nie jest None i nie jest liczba negatywna to doda
-                data.append(int(row[0]))
+            if not row or not row[0].strip():
+                puste_wiersze += 1
+                continue
 
-            if int(row[0]) < 0 and not komunikat_o_negatywnych_liczbach: # -- Jezeli liczba jest negatywna pominie jej I wysli jeden raz komunikat dla uzytkownika --
-                showinfo(title="W wybranym pliku", message="Liczby mniejsze od zera zostaną pominięte." )
-                komunikat_o_negatywnych_liczbach = True
+            try:
+                liczba = int(row[0])
+            except ValueError:
+                niepoprawne_wiersze += 1
+                continue
+
+            if liczba < 0:
+                ujemne_liczby += 1
+                continue
+
+            nowa_data.append(liczba)
                 
-    if len(data) < 5: # -- Jezeli dannych jest za malo wyszli komunikat i nic nie zrobi --
+    if puste_wiersze or niepoprawne_wiersze or ujemne_liczby:
+        showinfo(title="W wybranym pliku",
+                 message=f"Pominięto wiersze:\n"
+                         f"Puste: {puste_wiersze}\n"
+                         f"Niepoprawne: {niepoprawne_wiersze}\n"
+                         f"Liczby ujemne: {ujemne_liczby}")
+
+    if len(nowa_data) < 5: # -- Jezeli dannych jest za malo wyszli komunikat i nic nie zrobi --
         showinfo(title="Wybrany plik", message="Musi być 5 lub więcej elementów!" )
     else: # -- jezeli wszystjo jest dobrze to dane wstawia dane --
+        data = nowa_data
         kopia_daty = data.copy()
         drawData(data=data, colorArray=["red" for _ in range(len(data))])
 
@@ -337,7 +361,10 @@ def Export_button():
     global data
     
     if data: # -- jezeli list data nie jest puste to zapisze do pliku --
-        fileName = fd.askopenfilename(title="Wybierz plik CSV do zapisu", initialdir="/", filetypes=[("Pliki CSV", "*.csv")]) # -- askopenfilename prosi nazwa file dla odkrycia --
+        fileName = fd.asksaveasfilename(title="Zapisz plik CSV", initialdir="/", defaultextension=".csv", filetypes=[("Pliki CSV", "*.csv")]) # -- asksaveasfilename prosi nazwa file dla zapisu --
+        if not fileName:
+            return
+
         with open(fileName, "w", newline='') as csvfile:
             write = csv.writer(csvfile)
 
